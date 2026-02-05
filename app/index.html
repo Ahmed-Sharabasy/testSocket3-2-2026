@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Socket.IO Client</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>Socket.IO Client</h1>
+      <div class="status" id="status">
+        <span class="status-dot"></span>
+        <span class="status-text">Connecting...</span>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="messages" id="messages"></div>
+
+      <form class="form" id="form">
+        <input type="text" id="input" placeholder="Type a message..." autocomplete="off" />
+        <button type="submit" id="sendBtn" disabled>Send</button>
+      </form>
+    </main>
+  </div>
+
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>
