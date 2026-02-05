@@ -1,12 +1,11 @@
 // Connect to your Socket.IO server (change if server runs elsewhere)
-const SOCKET_URL = window.location.origin;
-console.log(SOCKET_URL);
+const SOCKET_URL = window.location.origin; // "http://localhost:3000" or your server URL
 
 const socket = io(SOCKET_URL, {
   autoConnect: true,
   reconnection: true,
   reconnectionAttempts: 5,
-  reconnectionDelay: 1000,
+  reconnectionDelay: 2000,
 });
 
 const statusEl = document.getElementById("status");
@@ -60,11 +59,6 @@ socket.on("message", (data) => {
       ? data
       : data.text || data.message || JSON.stringify(data);
   addMessage(text, "received");
-});
-
-// Optional: listen for broadcast / chat events if your server uses them
-socket.on("chat message", (msg) => {
-  addMessage(msg, "received");
 });
 
 // Send message on form submit

@@ -16,11 +16,14 @@ const io = new Server(httpServer, {
 // Handle socket connections
 io.on("connection", (socket) => {
   console.log(`Client connected: ${socket.id}`);
-});
 
-io.on("sendMessage", (data) => {
-  console.log("Received message:", data);
-  io.emit("message", data);
+  socket.emit("welcome-message-from-server", "Welcome!");
+
+  socket.on("sendMessage", (data) => {
+    console.log("Received message:", data);
+
+    io.emit("message", data);
+  });
 });
 
 // render static files from "app" directory
