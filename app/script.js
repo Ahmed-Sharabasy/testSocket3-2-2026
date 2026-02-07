@@ -5,7 +5,7 @@ const socket = io(SOCKET_URL, {
   autoConnect: true,
   reconnection: true,
   reconnectionAttempts: 5,
-  reconnectionDelay: 2000,
+  reconnectionDelay: 1000,
 });
 
 const statusEl = document.getElementById("status");
@@ -14,6 +14,10 @@ const messagesEl = document.getElementById("messages");
 const form = document.getElementById("form");
 const input = document.getElementById("input");
 const sendBtn = document.getElementById("sendBtn");
+const roomInput = document.getElementById("roomInput");
+const joinRoomBtn = document.getElementById("joinRoomBtn");
+
+let currentRoom = null;
 
 function setStatus(connected) {
   statusEl.classList.remove("connected", "disconnected");
@@ -52,22 +56,51 @@ socket.on("connect_error", (err) => {
   addMessage(`Connection error: ${err.message}`, "system");
 });
 
-// Listen for messages from server (adjust event name to match your server)
-socket.on("message", (data) => {
-  const text =
-    typeof data === "string"
-      ? data
-      : data.text || data.message || JSON.stringify(data);
-  addMessage(text, "received");
-});
-
 // Send message on form submit
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   const text = input.value.trim();
   if (!text) return;
-
   addMessage(text, "sent");
-  socket.emit("message", text);
+
+  // Send message to the current room if joined, otherwise broadcast
+  if (currentRoom) {
+    socket.emit("message", { room: currentRoom, text });
+  } else {
+    socket.emit("message", text);
+  }
+
   input.value = "";
+});
+
+socket.on("message", (data) => {
+  addMessage(data, "received");
+});
+
+// Room joining functionality
+joinRoomBtn.addEventListener("click", () => {
+  const roomName = roomInput.value.trim();
+  if (!roomName) {
+    addMessage("Please enter a room name", "system");
+    return;
+  }
+
+  socket.emit("joinRoom", roomName);
+  roomInput.value = "";
+});
+
+socket.on("roomJoined", (room) => {
+  currentRoom = room;
+  addMessage(`You joined room: ${room}`, "system");
+});
+
+socket.on("roomLeft", (room) => {
+  addMessage(`You left room: ${room}`, "system");
+  if (currentRoom === room) {
+    currentRoom = null;
+  }
+});
+
+socket.on("roomMessage", (data) => {
+  addMessage(`[${data.room}] ${data.text}`, "received");
 });

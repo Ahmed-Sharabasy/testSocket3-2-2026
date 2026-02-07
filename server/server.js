@@ -17,12 +17,8 @@ const io = new Server(httpServer, {
 io.on("connection", (socket) => {
   console.log(`Client connected: ${socket.id}`);
 
-  socket.emit("welcome-message-from-server", "Welcome!");
-
-  socket.on("sendMessage", (data) => {
-    console.log("Received message:", data);
-
-    io.emit("message", data);
+  socket.on("message", (data) => {
+    socket.broadcast.emit("message", data); // Broadcast to all other clients
   });
 });
 

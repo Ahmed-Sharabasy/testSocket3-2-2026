@@ -78,6 +78,53 @@ body {
   }
 }
 
+.room-section {
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.15);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.room-section input {
+  flex: 1;
+  padding: 0.65rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #e8e8e8;
+  font-size: 0.9375rem;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.room-section input::placeholder {
+  color: #6b7280;
+}
+
+.room-section input:focus {
+  border-color: #10b981;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.room-section button {
+  padding: 0.65rem 1.25rem;
+  border: none;
+  border-radius: 8px;
+  background: #10b981;
+  color: #fff;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.room-section button:hover {
+  background: #059669;
+}
+
 .main {
   flex: 1;
   display: flex;
