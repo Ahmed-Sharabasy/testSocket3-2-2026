@@ -1,5 +1,5 @@
-// Connect to your Socket.IO server (change if server runs elsewhere)
-const SOCKET_URL = window.location.origin; // "http://localhost:3000" or your server URL
+// Connect to Socket.IO server
+const SOCKET_URL = window.location.origin;
 
 const socket = io(SOCKET_URL, {
   autoConnect: true,
@@ -8,6 +8,7 @@ const socket = io(SOCKET_URL, {
   reconnectionDelay: 1000,
 });
 
+// DOM elements
 const statusEl = document.getElementById("status");
 const statusText = statusEl.querySelector(".status-text");
 const messagesEl = document.getElementById("messages");
@@ -18,6 +19,8 @@ const roomInput = document.getElementById("roomInput");
 const joinRoomBtn = document.getElementById("joinRoomBtn");
 
 let currentRoom = null;
+
+// --- Helpers ---
 
 function setStatus(connected) {
   statusEl.classList.remove("connected", "disconnected");
@@ -40,7 +43,8 @@ function addMessage(text, type = "received") {
   messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
-// Connection events
+// --- Connection events ---
+
 socket.on("connect", () => {
   setStatus(true);
   addMessage("Connected to server", "system");
@@ -56,35 +60,50 @@ socket.on("connect_error", (err) => {
   addMessage(`Connection error: ${err.message}`, "system");
 });
 
-// Send message on form submit
+// --- Sending messages ---
+
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   const text = input.value.trim();
   if (!text) return;
+
   addMessage(text, "sent");
 
-  // Send message to the current room if joined, otherwise broadcast
   if (currentRoom) {
-    socket.emit("message", { room: currentRoom, text });
+    // Send to current room only
+    socket.emit("roomMessage", { room: currentRoom, text });
   } else {
+    // Broadcast to everyone
     socket.emit("message", text);
   }
 
   input.value = "";
 });
 
+// --- Receiving messages ---
+
+// Broadcast messages (no room)
 socket.on("message", (data) => {
-  addMessage(data, "received");
+  const text =
+    typeof data === "string" ? data : data.text || JSON.stringify(data);
+  addMessage(text, "received");
 });
 
-// Room joining functionality
+// Room messages
+socket.on("roomMessage", (data) => {
+  if (data && data.text) {
+    addMessage(`[${data.room}] ${data.text}`, "received");
+  }
+});
+
+// --- Room management ---
+
 joinRoomBtn.addEventListener("click", () => {
   const roomName = roomInput.value.trim();
   if (!roomName) {
     addMessage("Please enter a room name", "system");
     return;
   }
-
   socket.emit("joinRoom", roomName);
   roomInput.value = "";
 });
@@ -99,8 +118,4 @@ socket.on("roomLeft", (room) => {
   if (currentRoom === room) {
     currentRoom = null;
   }
-});
-
-socket.on("roomMessage", (data) => {
-  addMessage(`[${data.room}] ${data.text}`, "received");
 });
