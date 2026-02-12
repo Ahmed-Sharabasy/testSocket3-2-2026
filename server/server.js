@@ -2,7 +2,6 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 
-// init express + socket.io
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -12,7 +11,6 @@ const io = new Server(httpServer, {
   },
 });
 
-// Handle socket connections
 io.on("connection", (socket) => {
   console.log(`Client connected: ${socket.id}`);
 
@@ -26,6 +24,13 @@ io.on("connection", (socket) => {
     socket.join(roomName);
     console.log(`Client ${socket.id} joined room: ${roomName}`);
     socket.emit("roomJoined", roomName);
+  });
+
+  // Leave a room
+  socket.on("leaveRoom", (roomName) => {
+    socket.leave(roomName);
+    console.log(`Client ${socket.id} left room: ${roomName}`);
+    socket.emit("roomLeft", roomName);
   });
 
   // Send message to a specific room (excluding sender)

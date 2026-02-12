@@ -17,6 +17,7 @@ const input = document.getElementById("input");
 const sendBtn = document.getElementById("sendBtn");
 const roomInput = document.getElementById("roomInput");
 const joinRoomBtn = document.getElementById("joinRoomBtn");
+const leaveRoomBtn = document.getElementById("leaveRoomBtn");
 
 let currentRoom = null;
 
@@ -92,7 +93,7 @@ socket.on("message", (data) => {
 // Room messages
 socket.on("roomMessage", (data) => {
   if (data && data.text) {
-    addMessage(`[${data.room}] ${data.text}`, "received");
+    addMessage(`${data.room} ${data.text}`, "received");
   }
 });
 
@@ -105,6 +106,16 @@ joinRoomBtn.addEventListener("click", () => {
     return;
   }
   socket.emit("joinRoom", roomName);
+  roomInput.value = "";
+});
+
+leaveRoomBtn.addEventListener("click", () => {
+  const roomName = roomInput.value.trim();
+  if (!roomName) {
+    addMessage("Please enter a room name", "system");
+    return;
+  }
+  socket.emit("leaveRoom", roomName);
   roomInput.value = "";
 });
 
